@@ -1,0 +1,14 @@
+{
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/ear-training.html", "destination": "/apps/ear-training/", "permanent": true },
+    { "source": "/ear_training2.html", "destination": "/apps/ear-training-2/", "permanent": true },
+    { "source": "/artp5/art.html", "destination": "/apps/p5-art/", "permanent": true },
+    { "source": "/slowedreverb/sroudoriba-bu.html", "destination": "/apps/slowed-reverb/", "permanent": true },
+    { "source": "/game1_kame/game1_kamehame.html", "destination": "/lab/beam-game/", "permanent": true },
+    { "source": "/test/test.html", "destination": "/lab/ui-test/", "permanent": true },
+    { "source": "/test/:path*", "destination": "/lab/ui-test/:path*", "permanent": true },
+    { "source": "/vuedaisytest/top.html", "destination": "/lab/vue-daisy-test/", "permanent": true },
+    { "source": "/vuedaisytest/:path*", "destination": "/lab/vue-daisy-test/:path*", "permanent": true }
+  ]
+}
