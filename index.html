@@ -1,106 +1,395 @@
 <!DOCTYPE html>
-<html lang="ja" data-theme="light">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ryukaao - Portfolio</title>
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>ryukaao</title>
+  <meta name="description" content="Music & creative tools by ryukaao.">
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #0b0b10;
+      --fg: #ecebf2;
+      --dim: #8a8898;
+      --line: rgba(236, 235, 242, 0.12);
+      --violet: #a78bfa;
+      --cyan: #22d3ee;
+      --bc: #1da0c3;
+      --display: 'Syne', 'Zen Kaku Gothic New', sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --body: 'Zen Kaku Gothic New', 'Syne', sans-serif;
+      --gutter: clamp(16px, 4vw, 56px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      font-family: 'Poppins', sans-serif;
-      background: url('./assets/bgindex.png');
-      background-size: cover;
-      background-attachment: fixed;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--violet); color: var(--bg); }
+
+    /* film grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: .06;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
-    .fade-in {
-        animation: fadeIn 0.5s ease-out forwards;
+
+    #wave { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+    .wrap { position: relative; z-index: 1; padding: 0 var(--gutter); max-width: 1440px; margin: 0 auto; }
+
+    .label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* ---------- header strip ---------- */
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar nav { display: flex; gap: 24px; }
+    .topbar nav a:hover { color: var(--fg); }
+
+    /* ---------- hero ---------- */
+    .hero {
+      min-height: calc(100svh - 66px);
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: 1fr auto;
+      column-gap: 24px;
+      padding: 6vh 0 48px;
+    }
+    .title {
+      grid-column: 1 / -1;
+      align-self: center;
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: min(14.4vw, 205px);
+      line-height: .82;
+      white-space: nowrap;
+      letter-spacing: -.05em;
+      margin-left: -.04em;
+    }
+    .title span { display: inline-block; opacity: 0; transform: translateY(40%); animation: rise .9s cubic-bezier(.2,.8,.2,1) forwards; }
+    .title .accent {
+      background: linear-gradient(100deg, var(--violet), var(--cyan));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+
+    .tagline {
+      grid-column: 1 / 5;
+      align-self: end;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--dim);
+    }
+    .tagline b { color: var(--fg); font-weight: 400; }
+
+    /* Bandcamp block: the centerpiece */
+    .listen {
+      grid-column: 6 / -1;
+      align-self: end;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0;
+      border: 1px solid var(--line);
+      background: rgba(11, 11, 16, .55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .listen-cta {
+      display: flex; flex-direction: column; justify-content: space-between;
+      gap: 28px;
+      padding: 22px 26px;
+      background: var(--bc);
+      color: #fff;
+      min-width: 210px;
+      transition: background .3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .listen-cta::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(100deg, var(--violet), var(--cyan));
+      opacity: 0; transition: opacity .4s;
+    }
+    .listen-cta:hover::before { opacity: 1; }
+    .listen-cta > * { position: relative; }
+    .listen-cta .label { color: rgba(255,255,255,.75); white-space: nowrap; }
+    .listen-cta strong {
+      font-family: var(--display); font-weight: 700;
+      font-size: 30px; line-height: 1; letter-spacing: -.02em;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .listen-cta svg { width: 30px; height: 30px; transition: transform .4s; }
+    .listen-cta:hover svg { transform: translateX(6px); }
+    .player { padding: 14px; display: flex; flex-direction: column; justify-content: center; gap: 10px; min-width: 0; }
+    .player iframe { border: 0; width: 100%; height: 120px; display: block; }
+    .eq { display: flex; gap: 3px; align-items: flex-end; height: 12px; }
+    .eq i { width: 3px; background: var(--cyan); animation: eq 1s ease-in-out infinite; }
+    .eq i:nth-child(2) { animation-delay: -.3s; background: var(--violet); }
+    .eq i:nth-child(3) { animation-delay: -.6s; }
+    .eq i:nth-child(4) { animation-delay: -.15s; background: var(--violet); }
+    @keyframes eq { 0%,100% { height: 25%; } 50% { height: 100%; } }
+
+    .scroll-hint {
+      grid-column: 1 / -1;
+      margin-top: 40px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .scroll-hint::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+    /* ---------- sections ---------- */
+    section { padding: 120px 0 0; }
+    .sec-head {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      column-gap: 24px;
+      align-items: end;
+      margin-bottom: 40px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .sec-head .num { grid-column: 1 / 3; }
+    .sec-head h2 {
+      grid-column: 3 / 11;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(40px, 7vw, 104px);
+      line-height: .9;
+      letter-spacing: -.04em;
+    }
+    .sec-head .count { grid-column: 11 / -1; text-align: right; }
+
+    /* Creations: asymmetric bento of abstract tiles */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: 180px;
+      gap: 12px;
+    }
+    .tile {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      padding: 20px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      isolation: isolate;
+      transition: border-color .4s;
+    }
+    .tile .art {
+      position: absolute; inset: 0; z-index: -1;
+      opacity: .55;
+      transition: opacity .5s, transform .8s cubic-bezier(.2,.8,.2,1);
+    }
+    .tile:hover .art { opacity: .95; transform: scale(1.06) rotate(-1deg); }
+    .tile:hover { border-color: rgba(236,235,242,.35); }
+    .tile .top { display: flex; justify-content: space-between; }
+    .tile h3 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(20px, 2.2vw, 30px);
+      line-height: 1.05;
+      letter-spacing: -.02em;
+      max-width: 16ch;
+    }
+    .tile .arrow { transition: transform .4s; }
+    .tile:hover .arrow { transform: translate(4px, -4px); }
+    .tile:nth-child(5n+1) { grid-column: span 4; grid-row: span 2; }
+    .tile:nth-child(5n+1) h3 { font-size: clamp(28px, 4vw, 56px); }
+    .tile:nth-child(5n+2) { grid-column: span 2; grid-row: span 2; }
+    .tile:nth-child(5n+3) { grid-column: span 2; }
+    .tile:nth-child(5n+4) { grid-column: span 2; }
+    .tile:nth-child(5n+5) { grid-column: span 2; }
+
+    /* Zikken: index list with hover reveal */
+    .index { list-style: none; }
+    .index a {
+      display: grid;
+      grid-template-columns: 2fr 8fr 2fr;
+      column-gap: 24px;
+      align-items: center;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+      position: relative;
+    }
+    .index a::before {
+      content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 0;
+      background: linear-gradient(90deg, var(--violet), var(--cyan));
+      transition: width .6s cubic-bezier(.2,.8,.2,1);
+    }
+    .index a:hover::before { width: 100%; }
+    .index .name {
+      font-family: var(--display);
+      font-weight: 500;
+      font-size: clamp(22px, 3.2vw, 44px);
+      letter-spacing: -.02em;
+      line-height: 1.1;
+      transition: transform .5s cubic-bezier(.2,.8,.2,1), color .3s;
+    }
+    .index a:hover .name { transform: translateX(16px); color: var(--cyan); }
+    .index .go { text-align: right; opacity: 0; transition: opacity .3s; }
+    .index a:hover .go { opacity: 1; }
+
+    /* Links: oversized row */
+    .links {
+      display: flex; flex-wrap: wrap;
+      gap: 6px 36px;
+    }
+    .links a {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(28px, 5vw, 72px);
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--fg);
+      transition: color .3s;
+    }
+    .links a:hover { color: var(--fg); }
+    .links a.main { color: var(--bc); -webkit-text-stroke: 0; }
+    .links a.main:hover { color: var(--cyan); }
+    .links sup { font-family: var(--mono); font-size: 11px; -webkit-text-stroke: 0; color: var(--dim); vertical-align: top; margin-left: 4px; }
+
+    footer {
+      margin-top: 140px;
+      padding: 24px 0 32px;
+      border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between;
+    }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s cubic-bezier(.2,.8,.2,1); }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      .tagline { grid-column: 1 / -1; margin: 32px 0 20px; }
+      .listen { grid-column: 1 / -1; }
+      .bento { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 150px; }
+      .tile:nth-child(n) { grid-column: span 1; grid-row: span 1; }
+      .tile:nth-child(5n+1) { grid-column: span 2; grid-row: span 2; }
+    }
+    @media (max-width: 600px) {
+      .topbar nav { display: none; }
+      .listen { grid-template-columns: 1fr; }
+      .listen-cta { flex-direction: row; align-items: center; min-width: 0; }
+      .sec-head .num { grid-column: 1 / 7; }
+      .sec-head .count { grid-column: 7 / -1; }
+      .sec-head h2 { grid-column: 1 / -1; grid-row: 2; margin-top: 12px; }
+      .index a { grid-template-columns: 3fr 9fr; }
+      .index .go { display: none; }
+      section { padding-top: 88px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .title span, .reveal { animation: none; opacity: 1; transform: none; transition: none; }
+      .eq i { animation: none; height: 60%; }
     }
   </style>
 </head>
 <body>
-  <div id="app" class="container mx-auto p-4 sm:p-8">
+  <canvas id="wave" aria-hidden="true"></canvas>
 
-    <div class="hero min-h-[30vh] glass rounded-box shadow-xl mb-12 sm:mb-20">
-      <div class="hero-content text-center">
-        <div class="max-w-md">
-          <h1 class="text-5xl sm:text-7xl font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-            ryukaao
-          </h1>
-          <p class="py-6 text-lg text-base-content">Music &amp; creative tools by ryukaao.</p>
-          <a href="https://ryukaao.bandcamp.com/" target="_blank" rel="noopener noreferrer"
-             class="btn btn-lg rounded-full border-0 text-white shadow-lg hover:scale-105 transition-transform duration-300"
-             style="background-color: #1da0c3;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" aria-hidden="true"><path d="M0 18.75l7.437-13.5H24l-7.438 13.5H0z"/></svg>
-            Listen on Bandcamp
-          </a>
-          <div class="mt-6 rounded-box overflow-hidden shadow-lg">
-            <iframe title="Game OST by ryukaao" style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/album=4041477557/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://ryukaao.bandcamp.com/album/game-ost">Game OST by ryukaao</a></iframe>
-          </div>
+  <div id="app" class="wrap">
+
+    <header class="topbar">
+      <span class="label">ryukaao / portfolio</span>
+      <nav class="label">
+        <a href="#creations">Creations</a>
+        <a href="#zikken">Zikken</a>
+        <a href="#links">Links</a>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <h1 class="title" aria-label="ryukaao">
+        <span v-for="(ch, i) in 'ryukaao'" :key="i" :class="{ accent: i >= 4 }" :style="{ animationDelay: (i * 70) + 'ms' }">{{ ch }}</span>
+      </h1>
+
+      <p class="tagline"><b>Music</b> &amp; creative tools by ryukaao.</p>
+
+      <div class="listen">
+        <a class="listen-cta" href="https://ryukaao.bandcamp.com/" target="_blank" rel="noopener noreferrer">
+          <span class="label">Listen on</span>
+          <strong>
+            Bandcamp
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 18.75l7.437-13.5H24l-7.438 13.5H0z"/></svg>
+          </strong>
+        </a>
+        <div class="player">
+          <div class="label" style="display:flex;gap:10px;align-items:center"><span class="eq"><i></i><i></i><i></i><i></i></span>Game OST</div>
+          <iframe title="Game OST by ryukaao" src="https://bandcamp.com/EmbeddedPlayer/album=4041477557/size=large/bgcol=333333/linkcol=0f91ff/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://ryukaao.bandcamp.com/album/game-ost">Game OST by ryukaao</a></iframe>
           <!-- BANDCAMP_PLAYER -->
         </div>
       </div>
+
+      <div class="scroll-hint label">Scroll</div>
     </div>
 
     <main>
-      <section class="mb-16">
-        <h2 class="text-3xl font-bold text-center mb-10 text-primary">Creations</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <a v-for="(item, index) in creations" :key="item.title" :href="item.url"
-             class="card glass shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out fade-in group"
-             :style="{ animationDelay: (index * 100) + 'ms' }">
-            <div class="card-body items-center text-center">
-              <h3 class="card-title text-xl font-semibold group-hover:text-secondary transition-colors">{{ item.title }}</h3>
-              <p class="text-base-content/70">{{ item.description || 'Click to see more' }}</p>
-            </div>
+      <section id="creations">
+        <div class="sec-head reveal">
+          <span class="num label">01</span>
+          <h2>Creations</h2>
+          <span class="count label">{{ pad(creations.length) }} works</span>
+        </div>
+        <div class="bento">
+          <a v-for="(item, i) in creations" :key="item.title" :href="item.url" class="tile reveal" :title="item.description">
+            <div class="art" :style="art(i)"></div>
+            <div class="top label"><span>{{ pad(i + 1) }}</span><span class="arrow">↗</span></div>
+            <h3>{{ item.title }}</h3>
           </a>
         </div>
       </section>
 
-      <div class="divider divider-accent my-16"></div>
-
-      <section class="mb-16">
-        <h2 class="text-3xl font-bold text-center mb-10 text-accent">Zikken</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <a v-for="(item, index) in zikken" :key="item.title" :href="item.url"
-             class="card glass shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out fade-in group"
-             :style="{ animationDelay: (index * 100) + 'ms' }">
-            <div class="card-body items-center text-center">
-              <h3 class="card-title text-xl font-semibold group-hover:text-secondary transition-colors">{{ item.title }}</h3>
-              <p class="text-base-content/70">{{ item.description || 'Click to see more' }}</p>
-            </div>
-          </a>
+      <section id="zikken">
+        <div class="sec-head reveal">
+          <span class="num label">02</span>
+          <h2>Zikken</h2>
+          <span class="count label">{{ pad(zikken.length) }} experiments</span>
         </div>
+        <ul class="index">
+          <li v-for="(item, i) in zikken" :key="item.title" class="reveal">
+            <a :href="item.url" :title="item.description">
+              <span class="label">Z—{{ pad(i + 1) }}</span>
+              <span class="name">{{ item.title }}</span>
+              <span class="go label">Open →</span>
+            </a>
+          </li>
+        </ul>
       </section>
 
-      <div class="divider divider-primary my-16"></div>
-
-      <section>
-        <h2 class="text-3xl font-bold text-center mb-10 text-neutral">Links</h2>
-        <div class="flex flex-wrap justify-center gap-6">
-          <a v-for="(item, index) in links" :key="item.title" :href="item.url" target="_blank" rel="noopener noreferrer"
-             class="btn btn-wide btn-neutral btn-outline transition-transform duration-300 hover:scale-105 fade-in"
-             :style="{ animationDelay: (creations.length * 100 + index * 100) + 'ms' }">
-            {{ item.title }}
-          </a>
+      <section id="links">
+        <div class="sec-head reveal">
+          <span class="num label">03</span>
+          <h2>Links</h2>
+          <span class="count label">Elsewhere</span>
+        </div>
+        <div class="links reveal">
+          <a v-for="(item, i) in links" :key="item.title" :href="item.url" target="_blank" rel="noopener noreferrer"
+             :class="{ main: item.title === 'Bandcamp' }">{{ item.title }}<sup>{{ pad(i + 1) }}</sup></a>
         </div>
       </section>
     </main>
 
-    <footer class="footer footer-center p-10 mt-20 glass text-base-content rounded-box">
-        <aside>
-            <p class="font-semibold">ryukaao's Portfolio</p>
-        </aside>
+    <footer class="label">
+      <span>© ryukaao</span>
+      <a href="#">Top ↑</a>
     </footer>
-
   </div>
 
   <script>
@@ -131,8 +420,73 @@
             { title: 'Bandcamp', url: 'https://ryukaao.bandcamp.com/' }
           ]
         }
+      },
+      methods: {
+        pad(n) { return String(n).padStart(2, '0') },
+        // abstract gradient per tile, derived from its position
+        art(i) {
+          const h = (262 + i * 47) % 360
+          const h2 = (h + 70) % 360
+          const x = 20 + (i * 37) % 60
+          const y = 15 + (i * 53) % 70
+          return {
+            background:
+              `radial-gradient(circle at ${x}% ${y}%, hsla(${h},85%,65%,.9), transparent 45%),` +
+              `radial-gradient(circle at ${100 - x}% ${100 - y}%, hsla(${h2},85%,55%,.7), transparent 50%),` +
+              `repeating-linear-gradient(${i * 30}deg, transparent 0 14px, rgba(255,255,255,.04) 14px 15px)`
+          }
+        }
+      },
+      mounted() {
+        const io = new IntersectionObserver(entries => {
+          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } })
+        }, { threshold: 0.12 })
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el))
       }
     }).mount('#app')
+
+    // background: slow interfering sound waves that lean toward the cursor
+    ;(() => {
+      const cv = document.getElementById('wave')
+      const ctx = cv.getContext('2d')
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+      let w, h, dpr, mx = 0.5, my = 0.5, t = 0
+      const resize = () => {
+        dpr = Math.min(devicePixelRatio || 1, 2)
+        w = cv.width = innerWidth * dpr
+        h = cv.height = innerHeight * dpr
+      }
+      addEventListener('resize', resize)
+      addEventListener('pointermove', e => { mx = e.clientX / innerWidth; my = e.clientY / innerHeight })
+      resize()
+      const LINES = 14
+      const draw = () => {
+        ctx.clearRect(0, 0, w, h)
+        for (let k = 0; k < LINES; k++) {
+          const p = k / (LINES - 1)
+          const grad = ctx.createLinearGradient(0, 0, w, 0)
+          grad.addColorStop(0, `rgba(167,139,250,${0.05 + p * 0.12})`)
+          grad.addColorStop(1, `rgba(34,211,238,${0.05 + (1 - p) * 0.12})`)
+          ctx.strokeStyle = grad
+          ctx.lineWidth = dpr
+          ctx.beginPath()
+          const base = h * (0.3 + p * 0.45)
+          for (let x = 0; x <= w; x += 6 * dpr) {
+            const u = x / w
+            const pull = Math.exp(-((u - mx) ** 2) * 18) * (my - 0.5) * h * 0.25
+            const y = base
+              + Math.sin(u * 7 + t * 0.6 + k * 0.35) * h * 0.035
+              + Math.sin(u * 17 - t * 0.9 + k * 0.6) * h * 0.012 * (1 + p)
+              + pull * (1 - Math.abs(p - 0.5))
+            x ? ctx.lineTo(x, y) : ctx.moveTo(x, y)
+          }
+          ctx.stroke()
+        }
+        t += 0.01
+        if (!still) requestAnimationFrame(draw)
+      }
+      draw()
+    })()
   </script>
 
 </body>
