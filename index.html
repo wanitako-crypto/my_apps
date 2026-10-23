@@ -10,14 +10,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* palette taken from assets/bgindex.png */
     :root {
-      --bg: #0b0b10;
-      --fg: #ecebf2;
-      --dim: #8a8898;
-      --line: rgba(236, 235, 242, 0.12);
-      --violet: #a78bfa;
-      --cyan: #22d3ee;
-      --bc: #1da0c3;
+      --teal: #2a9d8f;
+      --deep: #1c6f66;
+      --ink: #173430;
+      --dim: #5f7570;
+      --paper: #fbf6ea;
+      --paper-2: #f3ead4;
+      --mustard: #e9d36f;
+      --peach: #eeb46b;
+      --orange: #dc8758;
+      --sage: #9fae7d;
+      --line: rgba(23, 52, 48, 0.14);
       --display: 'Syne', 'Zen Kaku Gothic New', sans-serif;
       --mono: 'JetBrains Mono', ui-monospace, monospace;
       --body: 'Zen Kaku Gothic New', 'Syne', sans-serif;
@@ -26,26 +31,27 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
-      background: var(--bg);
-      color: var(--fg);
+      background: var(--teal) url('./assets/bgindex.png') center / cover fixed;
+      color: var(--ink);
       font-family: var(--body);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
     a { color: inherit; text-decoration: none; }
-    ::selection { background: var(--violet); color: var(--bg); }
+    ::selection { background: var(--mustard); color: var(--ink); }
 
-    /* film grain */
+    /* paper grain */
     body::after {
       content: '';
       position: fixed; inset: 0;
       pointer-events: none;
       z-index: 50;
-      opacity: .06;
+      opacity: .07;
+      mix-blend-mode: multiply;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    #wave { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+    #wave { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .wrap { position: relative; z-index: 1; padding: 0 var(--gutter); max-width: 1440px; margin: 0 auto; }
 
     .label {
@@ -56,14 +62,16 @@
       color: var(--dim);
     }
 
-    /* ---------- header strip ---------- */
+    /* ---------- header strip (on the image) ---------- */
     .topbar {
       display: flex; justify-content: space-between; align-items: center;
       padding: 22px 0;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid rgba(251, 246, 234, .35);
     }
+    .topbar .label { color: var(--paper); }
     .topbar nav { display: flex; gap: 24px; }
-    .topbar nav a:hover { color: var(--fg); }
+    .topbar nav a { opacity: .8; transition: opacity .2s; }
+    .topbar nav a:hover { opacity: 1; }
 
     /* ---------- hero ---------- */
     .hero {
@@ -81,25 +89,27 @@
       font-weight: 800;
       font-size: min(14.4vw, 205px);
       line-height: .82;
-      white-space: nowrap;
       letter-spacing: -.05em;
+      white-space: nowrap;
       margin-left: -.04em;
+      color: var(--paper);
+      text-shadow: .035em .035em 0 var(--ink);
     }
     .title span { display: inline-block; opacity: 0; transform: translateY(40%); animation: rise .9s cubic-bezier(.2,.8,.2,1) forwards; }
-    .title .accent {
-      background: linear-gradient(100deg, var(--violet), var(--cyan));
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
+    .title .accent { color: var(--mustard); }
     @keyframes rise { to { opacity: 1; transform: none; } }
 
     .tagline {
       grid-column: 1 / 5;
       align-self: end;
+      justify-self: start;
       font-size: 15px;
       line-height: 1.7;
-      color: var(--dim);
+      color: var(--ink);
+      background: var(--paper);
+      padding: 10px 16px;
     }
-    .tagline b { color: var(--fg); font-weight: 400; }
+    .tagline b { font-weight: 700; }
 
     /* Bandcamp block: the centerpiece */
     .listen {
@@ -107,31 +117,20 @@
       align-self: end;
       display: grid;
       grid-template-columns: auto 1fr;
-      gap: 0;
-      border: 1px solid var(--line);
-      background: rgba(11, 11, 16, .55);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: var(--paper);
+      box-shadow: 10px 10px 0 var(--ink);
     }
     .listen-cta {
       display: flex; flex-direction: column; justify-content: space-between;
       gap: 28px;
       padding: 22px 26px;
-      background: var(--bc);
-      color: #fff;
+      background: var(--orange);
+      color: var(--paper);
       min-width: 210px;
       transition: background .3s;
-      position: relative;
-      overflow: hidden;
     }
-    .listen-cta::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(100deg, var(--violet), var(--cyan));
-      opacity: 0; transition: opacity .4s;
-    }
-    .listen-cta:hover::before { opacity: 1; }
-    .listen-cta > * { position: relative; }
-    .listen-cta .label { color: rgba(255,255,255,.75); white-space: nowrap; }
+    .listen-cta:hover { background: var(--ink); }
+    .listen-cta .label { color: rgba(251, 246, 234, .85); white-space: nowrap; }
     .listen-cta strong {
       font-family: var(--display); font-weight: 700;
       font-size: 30px; line-height: 1; letter-spacing: -.02em;
@@ -142,21 +141,30 @@
     .player { padding: 14px; display: flex; flex-direction: column; justify-content: center; gap: 10px; min-width: 0; }
     .player iframe { border: 0; width: 100%; height: 120px; display: block; }
     .eq { display: flex; gap: 3px; align-items: flex-end; height: 12px; }
-    .eq i { width: 3px; background: var(--cyan); animation: eq 1s ease-in-out infinite; }
-    .eq i:nth-child(2) { animation-delay: -.3s; background: var(--violet); }
-    .eq i:nth-child(3) { animation-delay: -.6s; }
-    .eq i:nth-child(4) { animation-delay: -.15s; background: var(--violet); }
+    .eq i { width: 3px; background: var(--teal); animation: eq 1s ease-in-out infinite; }
+    .eq i:nth-child(2) { animation-delay: -.3s; background: var(--orange); }
+    .eq i:nth-child(3) { animation-delay: -.6s; background: var(--peach); }
+    .eq i:nth-child(4) { animation-delay: -.15s; background: var(--sage); }
     @keyframes eq { 0%,100% { height: 25%; } 50% { height: 100%; } }
 
     .scroll-hint {
       grid-column: 1 / -1;
       margin-top: 40px;
       display: flex; align-items: center; gap: 14px;
+      color: var(--paper);
     }
-    .scroll-hint::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+    .scroll-hint::after { content: ''; flex: 1; height: 1px; background: rgba(251, 246, 234, .35); }
+
+    /* ---------- paper sheet that scrolls over the image ---------- */
+    .sheet {
+      background: var(--paper);
+      margin: 0 calc(var(--gutter) * -0.5);
+      padding: 0 calc(var(--gutter) * 1.2);
+      box-shadow: 0 -1px 0 var(--line);
+    }
 
     /* ---------- sections ---------- */
-    section { padding: 120px 0 0; }
+    section { padding: 110px 0 0; }
     .sec-head {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
@@ -164,9 +172,12 @@
       align-items: end;
       margin-bottom: 40px;
       padding-bottom: 18px;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 2px solid var(--ink);
     }
-    .sec-head .num { grid-column: 1 / 3; }
+    .sec-head .num { grid-column: 1 / 3; display: flex; align-items: center; gap: 10px; }
+    .sec-head .num::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--dot, var(--teal)); }
+    #zikken { --dot: var(--orange); }
+    #links { --dot: var(--mustard); }
     .sec-head h2 {
       grid-column: 3 / 11;
       font-family: var(--display);
@@ -177,7 +188,7 @@
     }
     .sec-head .count { grid-column: 11 / -1; text-align: right; }
 
-    /* Creations: asymmetric bento of abstract tiles */
+    /* Creations: asymmetric bento of geometric tiles (same language as the background) */
     .bento {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -187,20 +198,24 @@
     .tile {
       position: relative;
       overflow: hidden;
-      border: 1px solid var(--line);
       padding: 20px;
       display: flex; flex-direction: column; justify-content: space-between;
       isolation: isolate;
-      transition: border-color .4s;
+      background: var(--tile-bg);
+      color: var(--paper);
+      transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s;
     }
-    .tile .art {
-      position: absolute; inset: 0; z-index: -1;
-      opacity: .55;
-      transition: opacity .5s, transform .8s cubic-bezier(.2,.8,.2,1);
+    .tile:hover { transform: translate(-4px, -4px); box-shadow: 8px 8px 0 var(--ink); }
+    .tile .shape {
+      position: absolute; z-index: -1;
+      opacity: .9;
+      transition: transform .9s cubic-bezier(.2,.8,.2,1);
     }
-    .tile:hover .art { opacity: .95; transform: scale(1.06) rotate(-1deg); }
-    .tile:hover { border-color: rgba(236,235,242,.35); }
+    .tile .shape.circle { border-radius: 50%; }
+    .tile:hover .shape.circle { transform: translate(-8%, 6%) scale(1.08); }
+    .tile:hover .shape.square { transform: translate(6%, -6%) rotate(8deg); }
     .tile .top { display: flex; justify-content: space-between; }
+    .tile .top.label { color: inherit; opacity: .85; }
     .tile h3 {
       font-family: var(--display);
       font-weight: 700;
@@ -230,8 +245,8 @@
       position: relative;
     }
     .index a::before {
-      content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 0;
-      background: linear-gradient(90deg, var(--violet), var(--cyan));
+      content: ''; position: absolute; left: 0; bottom: -1px; height: 3px; width: 0;
+      background: var(--orange);
       transition: width .6s cubic-bezier(.2,.8,.2,1);
     }
     .index a:hover::before { width: 100%; }
@@ -243,7 +258,7 @@
       line-height: 1.1;
       transition: transform .5s cubic-bezier(.2,.8,.2,1), color .3s;
     }
-    .index a:hover .name { transform: translateX(16px); color: var(--cyan); }
+    .index a:hover .name { transform: translateX(16px); color: var(--deep); }
     .index .go { text-align: right; opacity: 0; transition: opacity .3s; }
     .index a:hover .go { opacity: 1; }
 
@@ -259,23 +274,24 @@
       letter-spacing: -.03em;
       line-height: 1.1;
       color: transparent;
-      -webkit-text-stroke: 1px var(--fg);
+      -webkit-text-stroke: 1.5px var(--ink);
       transition: color .3s;
     }
-    .links a:hover { color: var(--fg); }
-    .links a.main { color: var(--bc); -webkit-text-stroke: 0; }
-    .links a.main:hover { color: var(--cyan); }
+    .links a:hover { color: var(--ink); }
+    .links a.main { color: var(--orange); -webkit-text-stroke: 0; }
+    .links a.main:hover { color: var(--deep); }
     .links sup { font-family: var(--mono); font-size: 11px; -webkit-text-stroke: 0; color: var(--dim); vertical-align: top; margin-left: 4px; }
 
     footer {
       margin-top: 140px;
       padding: 24px 0 32px;
-      border-top: 1px solid var(--line);
+      border-top: 2px solid var(--ink);
       display: flex; justify-content: space-between;
     }
 
     .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s cubic-bezier(.2,.8,.2,1); }
     .reveal.in { opacity: 1; transform: none; }
+    .tile.reveal.in:hover { transform: translate(-4px, -4px); }
 
     @media (max-width: 900px) {
       .tagline { grid-column: 1 / -1; margin: 32px 0 20px; }
@@ -286,14 +302,15 @@
     }
     @media (max-width: 600px) {
       .topbar nav { display: none; }
-      .listen { grid-template-columns: 1fr; }
+      .listen { grid-template-columns: 1fr; box-shadow: 6px 6px 0 var(--ink); }
       .listen-cta { flex-direction: row; align-items: center; min-width: 0; }
+      .sheet { margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter); }
       .sec-head .num { grid-column: 1 / 7; }
       .sec-head .count { grid-column: 7 / -1; }
       .sec-head h2 { grid-column: 1 / -1; grid-row: 2; margin-top: 12px; }
       .index a { grid-template-columns: 3fr 9fr; }
       .index .go { display: none; }
-      section { padding-top: 88px; }
+      section { padding-top: 80px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .title span, .reveal { animation: none; opacity: 1; transform: none; transition: none; }
@@ -332,7 +349,7 @@
         </a>
         <div class="player">
           <div class="label" style="display:flex;gap:10px;align-items:center"><span class="eq"><i></i><i></i><i></i><i></i></span>Game OST</div>
-          <iframe title="Game OST by ryukaao" src="https://bandcamp.com/EmbeddedPlayer/album=4041477557/size=large/bgcol=333333/linkcol=0f91ff/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://ryukaao.bandcamp.com/album/game-ost">Game OST by ryukaao</a></iframe>
+          <iframe title="Game OST by ryukaao" src="https://bandcamp.com/EmbeddedPlayer/album=4041477557/size=large/bgcol=ffffff/linkcol=2a9d8f/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://ryukaao.bandcamp.com/album/game-ost">Game OST by ryukaao</a></iframe>
           <!-- BANDCAMP_PLAYER -->
         </div>
       </div>
@@ -340,56 +357,59 @@
       <div class="scroll-hint label">Scroll</div>
     </div>
 
-    <main>
-      <section id="creations">
-        <div class="sec-head reveal">
-          <span class="num label">01</span>
-          <h2>Creations</h2>
-          <span class="count label">{{ pad(creations.length) }} works</span>
-        </div>
-        <div class="bento">
-          <a v-for="(item, i) in creations" :key="item.title" :href="item.url" class="tile reveal" :title="item.description">
-            <div class="art" :style="art(i)"></div>
-            <div class="top label"><span>{{ pad(i + 1) }}</span><span class="arrow">↗</span></div>
-            <h3>{{ item.title }}</h3>
-          </a>
-        </div>
-      </section>
-
-      <section id="zikken">
-        <div class="sec-head reveal">
-          <span class="num label">02</span>
-          <h2>Zikken</h2>
-          <span class="count label">{{ pad(zikken.length) }} experiments</span>
-        </div>
-        <ul class="index">
-          <li v-for="(item, i) in zikken" :key="item.title" class="reveal">
-            <a :href="item.url" :title="item.description">
-              <span class="label">Z—{{ pad(i + 1) }}</span>
-              <span class="name">{{ item.title }}</span>
-              <span class="go label">Open →</span>
+    <div class="sheet">
+      <main>
+        <section id="creations">
+          <div class="sec-head reveal">
+            <span class="num label">01</span>
+            <h2>Creations</h2>
+            <span class="count label">{{ pad(creations.length) }} works</span>
+          </div>
+          <div class="bento">
+            <a v-for="(item, i) in creations" :key="item.title" :href="item.url" class="tile reveal" :title="item.description" :style="{ '--tile-bg': tone(i).bg }">
+              <div class="shape circle" :style="tone(i).circle"></div>
+              <div class="shape square" :style="tone(i).square"></div>
+              <div class="top label"><span>{{ pad(i + 1) }}</span><span class="arrow">↗</span></div>
+              <h3>{{ item.title }}</h3>
             </a>
-          </li>
-        </ul>
-      </section>
+          </div>
+        </section>
 
-      <section id="links">
-        <div class="sec-head reveal">
-          <span class="num label">03</span>
-          <h2>Links</h2>
-          <span class="count label">Elsewhere</span>
-        </div>
-        <div class="links reveal">
-          <a v-for="(item, i) in links" :key="item.title" :href="item.url" target="_blank" rel="noopener noreferrer"
-             :class="{ main: item.title === 'Bandcamp' }">{{ item.title }}<sup>{{ pad(i + 1) }}</sup></a>
-        </div>
-      </section>
-    </main>
+        <section id="zikken">
+          <div class="sec-head reveal">
+            <span class="num label">02</span>
+            <h2>Zikken</h2>
+            <span class="count label">{{ pad(zikken.length) }} experiments</span>
+          </div>
+          <ul class="index">
+            <li v-for="(item, i) in zikken" :key="item.title" class="reveal">
+              <a :href="item.url" :title="item.description">
+                <span class="label">Z—{{ pad(i + 1) }}</span>
+                <span class="name">{{ item.title }}</span>
+                <span class="go label">Open →</span>
+              </a>
+            </li>
+          </ul>
+        </section>
 
-    <footer class="label">
-      <span>© ryukaao</span>
-      <a href="#">Top ↑</a>
-    </footer>
+        <section id="links">
+          <div class="sec-head reveal">
+            <span class="num label">03</span>
+            <h2>Links</h2>
+            <span class="count label">Elsewhere</span>
+          </div>
+          <div class="links reveal">
+            <a v-for="(item, i) in links" :key="item.title" :href="item.url" target="_blank" rel="noopener noreferrer"
+               :class="{ main: item.title === 'Bandcamp' }">{{ item.title }}<sup>{{ pad(i + 1) }}</sup></a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="label">
+        <span>© ryukaao</span>
+        <a href="#">Top ↑</a>
+      </footer>
+    </div>
   </div>
 
   <script>
@@ -423,17 +443,23 @@
       },
       methods: {
         pad(n) { return String(n).padStart(2, '0') },
-        // abstract gradient per tile, derived from its position
-        art(i) {
-          const h = (262 + i * 47) % 360
-          const h2 = (h + 70) % 360
-          const x = 20 + (i * 37) % 60
-          const y = 15 + (i * 53) % 70
+        // circle + square composition per tile, echoing the background image
+        tone(i) {
+          const sets = [
+            ['#2a9d8f', '#e9d36f', '#dc8758'],
+            ['#dc8758', '#eeb46b', '#2a9d8f'],
+            ['#1c6f66', '#9fae7d', '#eeb46b'],
+            ['#9fae7d', '#e9d36f', '#1c6f66'],
+            ['#173430', '#dc8758', '#2a9d8f']
+          ]
+          const [bg, c, s] = sets[i % sets.length]
+          const cx = 35 + (i * 37) % 50
+          const cy = -30 + (i * 53) % 50
+          const size = 55 + (i * 29) % 35
           return {
-            background:
-              `radial-gradient(circle at ${x}% ${y}%, hsla(${h},85%,65%,.9), transparent 45%),` +
-              `radial-gradient(circle at ${100 - x}% ${100 - y}%, hsla(${h2},85%,55%,.7), transparent 50%),` +
-              `repeating-linear-gradient(${i * 30}deg, transparent 0 14px, rgba(255,255,255,.04) 14px 15px)`
+            bg,
+            circle: { background: c, width: size + '%', aspectRatio: '1', left: cx + '%', top: cy + '%' },
+            square: { background: s, width: (18 + (i * 13) % 14) + '%', aspectRatio: '1', left: (8 + (i * 23) % 30) + '%', top: (12 + (i * 17) % 20) + '%', opacity: .75 }
           }
         }
       },
@@ -459,15 +485,12 @@
       addEventListener('resize', resize)
       addEventListener('pointermove', e => { mx = e.clientX / innerWidth; my = e.clientY / innerHeight })
       resize()
-      const LINES = 14
+      const LINES = 12
       const draw = () => {
         ctx.clearRect(0, 0, w, h)
         for (let k = 0; k < LINES; k++) {
           const p = k / (LINES - 1)
-          const grad = ctx.createLinearGradient(0, 0, w, 0)
-          grad.addColorStop(0, `rgba(167,139,250,${0.05 + p * 0.12})`)
-          grad.addColorStop(1, `rgba(34,211,238,${0.05 + (1 - p) * 0.12})`)
-          ctx.strokeStyle = grad
+          ctx.strokeStyle = `rgba(251,246,234,${0.12 + (1 - Math.abs(p - 0.5) * 2) * 0.22})`
           ctx.lineWidth = dpr
           ctx.beginPath()
           const base = h * (0.3 + p * 0.45)
