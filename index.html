@@ -65,10 +65,11 @@
     /* ---------- header strip (on the image) ---------- */
     .topbar {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 22px 0;
-      border-bottom: 1px solid rgba(251, 246, 234, .35);
+      margin: 16px 0 0;
+      padding: 12px 18px;
+      background: var(--paper);
     }
-    .topbar .label { color: var(--paper); }
+    .topbar .label { color: var(--ink); }
     .topbar nav { display: flex; gap: 24px; }
     .topbar nav a { opacity: .8; transition: opacity .2s; }
     .topbar nav a:hover { opacity: 1; }
@@ -87,13 +88,15 @@
       align-self: center;
       font-family: var(--display);
       font-weight: 800;
-      font-size: min(14.4vw, 205px);
+      font-size: min(12.6vw, 180px);
       line-height: .82;
       letter-spacing: -.05em;
       white-space: nowrap;
-      margin-left: -.04em;
+      justify-self: start;
       color: var(--paper);
-      text-shadow: .035em .035em 0 var(--ink);
+      background: var(--ink);
+      padding: .1em .14em .16em .1em;
+      box-shadow: .05em .05em 0 var(--orange);
     }
     .title span { display: inline-block; opacity: 0; transform: translateY(40%); animation: rise .9s cubic-bezier(.2,.8,.2,1) forwards; }
     .title .accent { color: var(--mustard); }
@@ -151,8 +154,8 @@
       grid-column: 1 / -1;
       margin-top: 40px;
       display: flex; align-items: center; gap: 14px;
-      color: var(--paper);
     }
+    .scroll-hint span { background: var(--paper); color: var(--ink); padding: 6px 12px; }
     .scroll-hint::after { content: ''; flex: 1; height: 1px; background: rgba(251, 246, 234, .35); }
 
     /* ---------- paper sheet that scrolls over the image ---------- */
@@ -273,14 +276,13 @@
       font-size: clamp(28px, 5vw, 72px);
       letter-spacing: -.03em;
       line-height: 1.1;
-      color: transparent;
-      -webkit-text-stroke: 1.5px var(--ink);
+      color: var(--ink);
       transition: color .3s;
     }
-    .links a:hover { color: var(--ink); }
-    .links a.main { color: var(--orange); -webkit-text-stroke: 0; }
+    .links a:hover { color: var(--teal); }
+    .links a.main { color: var(--orange); }
     .links a.main:hover { color: var(--deep); }
-    .links sup { font-family: var(--mono); font-size: 11px; -webkit-text-stroke: 0; color: var(--dim); vertical-align: top; margin-left: 4px; }
+    .links sup { font-family: var(--mono); font-size: 11px; color: var(--dim); vertical-align: top; margin-left: 4px; }
 
     footer {
       margin-top: 140px;
@@ -354,7 +356,7 @@
         </div>
       </div>
 
-      <div class="scroll-hint label">Scroll</div>
+      <div class="scroll-hint label"><span>Scroll</span></div>
     </div>
 
     <div class="sheet">
