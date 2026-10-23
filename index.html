@@ -1,106 +1,417 @@
 <!DOCTYPE html>
-<html lang="ja" data-theme="light">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ryukaao - Portfolio</title>
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>ryukaao</title>
+  <meta name="description" content="Music & creative tools by ryukaao.">
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* palette taken from assets/bgindex.png */
+    :root {
+      --teal: #2a9d8f;
+      --deep: #1c6f66;
+      --ink: #173430;
+      --dim: #5f7570;
+      --paper: #fbf6ea;
+      --paper-2: #f3ead4;
+      --mustard: #e9d36f;
+      --peach: #eeb46b;
+      --orange: #dc8758;
+      --sage: #9fae7d;
+      --line: rgba(23, 52, 48, 0.14);
+      --display: 'Syne', 'Zen Kaku Gothic New', sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --body: 'Zen Kaku Gothic New', 'Syne', sans-serif;
+      --gutter: clamp(16px, 4vw, 56px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      font-family: 'Poppins', sans-serif;
-      background: url('./assets/bgindex.png');
-      background-size: cover;
-      background-attachment: fixed;
+      background: var(--teal) url('./assets/bgindex.png') center / cover fixed;
+      color: var(--ink);
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--mustard); color: var(--ink); }
+
+    /* paper grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: .07;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
-    .fade-in {
-        animation: fadeIn 0.5s ease-out forwards;
+
+    #wave { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .wrap { position: relative; z-index: 1; padding: 0 var(--gutter); max-width: 1440px; margin: 0 auto; }
+
+    .label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* ---------- header strip (on the image) ---------- */
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin: 16px 0 0;
+      padding: 12px 18px;
+      background: var(--paper);
+    }
+    .topbar .label { color: var(--ink); }
+    .topbar nav { display: flex; gap: 24px; }
+    .topbar nav a { opacity: .8; transition: opacity .2s; }
+    .topbar nav a:hover { opacity: 1; }
+
+    /* ---------- hero ---------- */
+    .hero {
+      min-height: calc(100svh - 66px);
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: 1fr auto;
+      column-gap: 24px;
+      padding: 6vh 0 48px;
+    }
+    .title {
+      grid-column: 1 / -1;
+      align-self: center;
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: min(12.6vw, 180px);
+      line-height: .82;
+      letter-spacing: -.05em;
+      white-space: nowrap;
+      justify-self: start;
+      color: var(--paper);
+      background: var(--ink);
+      padding: .1em .14em .16em .1em;
+      box-shadow: .05em .05em 0 var(--orange);
+    }
+    .title span { display: inline-block; opacity: 0; transform: translateY(40%); animation: rise .9s cubic-bezier(.2,.8,.2,1) forwards; }
+    .title .accent { color: var(--mustard); }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+
+    .tagline {
+      grid-column: 1 / 5;
+      align-self: end;
+      justify-self: start;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--ink);
+      background: var(--paper);
+      padding: 10px 16px;
+    }
+    .tagline b { font-weight: 700; }
+
+    /* Bandcamp block: the centerpiece */
+    .listen {
+      grid-column: 6 / -1;
+      align-self: end;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      background: var(--paper);
+      box-shadow: 10px 10px 0 var(--ink);
+    }
+    .listen-cta {
+      display: flex; flex-direction: column; justify-content: space-between;
+      gap: 28px;
+      padding: 22px 26px;
+      background: var(--orange);
+      color: var(--paper);
+      min-width: 210px;
+      transition: background .3s;
+    }
+    .listen-cta:hover { background: var(--ink); }
+    .listen-cta .label { color: rgba(251, 246, 234, .85); white-space: nowrap; }
+    .listen-cta strong {
+      font-family: var(--display); font-weight: 700;
+      font-size: 30px; line-height: 1; letter-spacing: -.02em;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .listen-cta svg { width: 30px; height: 30px; transition: transform .4s; }
+    .listen-cta:hover svg { transform: translateX(6px); }
+    .player { padding: 14px; display: flex; flex-direction: column; justify-content: center; gap: 10px; min-width: 0; }
+    .player iframe { border: 0; width: 100%; height: 120px; display: block; }
+    .eq { display: flex; gap: 3px; align-items: flex-end; height: 12px; }
+    .eq i { width: 3px; background: var(--teal); animation: eq 1s ease-in-out infinite; }
+    .eq i:nth-child(2) { animation-delay: -.3s; background: var(--orange); }
+    .eq i:nth-child(3) { animation-delay: -.6s; background: var(--peach); }
+    .eq i:nth-child(4) { animation-delay: -.15s; background: var(--sage); }
+    @keyframes eq { 0%,100% { height: 25%; } 50% { height: 100%; } }
+
+    .scroll-hint {
+      grid-column: 1 / -1;
+      margin-top: 40px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .scroll-hint span { background: var(--paper); color: var(--ink); padding: 6px 12px; }
+    .scroll-hint::after { content: ''; flex: 1; height: 1px; background: rgba(251, 246, 234, .35); }
+
+    /* ---------- paper sheet that scrolls over the image ---------- */
+    .sheet {
+      background: var(--paper);
+      margin: 0 calc(var(--gutter) * -0.5);
+      padding: 0 calc(var(--gutter) * 1.2);
+      box-shadow: 0 -1px 0 var(--line);
+    }
+
+    /* ---------- sections ---------- */
+    section { padding: 110px 0 0; }
+    .sec-head {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      column-gap: 24px;
+      align-items: end;
+      margin-bottom: 40px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid var(--ink);
+    }
+    .sec-head .num { grid-column: 1 / 3; display: flex; align-items: center; gap: 10px; }
+    .sec-head .num::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--dot, var(--teal)); }
+    #zikken { --dot: var(--orange); }
+    #links { --dot: var(--mustard); }
+    .sec-head h2 {
+      grid-column: 3 / 11;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(40px, 7vw, 104px);
+      line-height: .9;
+      letter-spacing: -.04em;
+    }
+    .sec-head .count { grid-column: 11 / -1; text-align: right; }
+
+    /* Creations: asymmetric bento of geometric tiles (same language as the background) */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: 180px;
+      gap: 12px;
+    }
+    .tile {
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      isolation: isolate;
+      background: var(--tile-bg);
+      color: var(--paper);
+      transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s;
+    }
+    .tile:hover { transform: translate(-4px, -4px); box-shadow: 8px 8px 0 var(--ink); }
+    .tile .shape {
+      position: absolute; z-index: -1;
+      opacity: .9;
+      transition: transform .9s cubic-bezier(.2,.8,.2,1);
+    }
+    .tile .shape.circle { border-radius: 50%; }
+    .tile:hover .shape.circle { transform: translate(-8%, 6%) scale(1.08); }
+    .tile:hover .shape.square { transform: translate(6%, -6%) rotate(8deg); }
+    .tile .top { display: flex; justify-content: space-between; }
+    .tile .top.label { color: inherit; opacity: .85; }
+    .tile h3 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(20px, 2.2vw, 30px);
+      line-height: 1.05;
+      letter-spacing: -.02em;
+      max-width: 16ch;
+    }
+    .tile .arrow { transition: transform .4s; }
+    .tile:hover .arrow { transform: translate(4px, -4px); }
+    .tile:nth-child(5n+1) { grid-column: span 4; grid-row: span 2; }
+    .tile:nth-child(5n+1) h3 { font-size: clamp(28px, 4vw, 56px); }
+    .tile:nth-child(5n+2) { grid-column: span 2; grid-row: span 2; }
+    .tile:nth-child(5n+3) { grid-column: span 2; }
+    .tile:nth-child(5n+4) { grid-column: span 2; }
+    .tile:nth-child(5n+5) { grid-column: span 2; }
+
+    /* Zikken: index list with hover reveal */
+    .index { list-style: none; }
+    .index a {
+      display: grid;
+      grid-template-columns: 2fr 8fr 2fr;
+      column-gap: 24px;
+      align-items: center;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+      position: relative;
+    }
+    .index a::before {
+      content: ''; position: absolute; left: 0; bottom: -1px; height: 3px; width: 0;
+      background: var(--orange);
+      transition: width .6s cubic-bezier(.2,.8,.2,1);
+    }
+    .index a:hover::before { width: 100%; }
+    .index .name {
+      font-family: var(--display);
+      font-weight: 500;
+      font-size: clamp(22px, 3.2vw, 44px);
+      letter-spacing: -.02em;
+      line-height: 1.1;
+      transition: transform .5s cubic-bezier(.2,.8,.2,1), color .3s;
+    }
+    .index a:hover .name { transform: translateX(16px); color: var(--deep); }
+    .index .go { text-align: right; opacity: 0; transition: opacity .3s; }
+    .index a:hover .go { opacity: 1; }
+
+    /* Links: oversized row */
+    .links {
+      display: flex; flex-wrap: wrap;
+      gap: 6px 36px;
+    }
+    .links a {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(28px, 5vw, 72px);
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      color: var(--ink);
+      transition: color .3s;
+    }
+    .links a:hover { color: var(--teal); }
+    .links a.main { color: var(--orange); }
+    .links a.main:hover { color: var(--deep); }
+    .links sup { font-family: var(--mono); font-size: 11px; color: var(--dim); vertical-align: top; margin-left: 4px; }
+
+    footer {
+      margin-top: 140px;
+      padding: 24px 0 32px;
+      border-top: 2px solid var(--ink);
+      display: flex; justify-content: space-between;
+    }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s cubic-bezier(.2,.8,.2,1); }
+    .reveal.in { opacity: 1; transform: none; }
+    .tile.reveal.in:hover { transform: translate(-4px, -4px); }
+
+    @media (max-width: 900px) {
+      .tagline { grid-column: 1 / -1; margin: 32px 0 20px; }
+      .listen { grid-column: 1 / -1; }
+      .bento { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 150px; }
+      .tile:nth-child(n) { grid-column: span 1; grid-row: span 1; }
+      .tile:nth-child(5n+1) { grid-column: span 2; grid-row: span 2; }
+    }
+    @media (max-width: 600px) {
+      .topbar nav { display: none; }
+      .listen { grid-template-columns: 1fr; box-shadow: 6px 6px 0 var(--ink); }
+      .listen-cta { flex-direction: row; align-items: center; min-width: 0; }
+      .sheet { margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter); }
+      .sec-head .num { grid-column: 1 / 7; }
+      .sec-head .count { grid-column: 7 / -1; }
+      .sec-head h2 { grid-column: 1 / -1; grid-row: 2; margin-top: 12px; }
+      .index a { grid-template-columns: 3fr 9fr; }
+      .index .go { display: none; }
+      section { padding-top: 80px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .title span, .reveal { animation: none; opacity: 1; transform: none; transition: none; }
+      .eq i { animation: none; height: 60%; }
     }
   </style>
 </head>
 <body>
-  <div id="app" class="container mx-auto p-4 sm:p-8">
+  <canvas id="wave" aria-hidden="true"></canvas>
 
-    <div class="hero min-h-[30vh] glass rounded-box shadow-xl mb-12 sm:mb-20">
-      <div class="hero-content text-center">
-        <div class="max-w-md">
-          <h1 class="text-5xl sm:text-7xl font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-            ryukaao
-          </h1>
-          <p class="py-6 text-lg text-base-content">Music &amp; creative tools by ryukaao.</p>
-          <a href="https://ryukaao.bandcamp.com/" target="_blank" rel="noopener noreferrer"
-             class="btn btn-lg rounded-full border-0 text-white shadow-lg hover:scale-105 transition-transform duration-300"
-             style="background-color: #1da0c3;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" aria-hidden="true"><path d="M0 18.75l7.437-13.5H24l-7.438 13.5H0z"/></svg>
-            Listen on Bandcamp
-          </a>
-          <div class="mt-6 rounded-box overflow-hidden shadow-lg">
-            <iframe title="Game OST by ryukaao" style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/album=4041477557/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://ryukaao.bandcamp.com/album/game-ost">Game OST by ryukaao</a></iframe>
-          </div>
+  <div id="app" class="wrap">
+
+    <header class="topbar">
+      <span class="label">ryukaao / portfolio</span>
+      <nav class="label">
+        <a href="#creations">Creations</a>
+        <a href="#zikken">Zikken</a>
+        <a href="#links">Links</a>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <h1 class="title" aria-label="ryukaao">
+        <span v-for="(ch, i) in 'ryukaao'" :key="i" :class="{ accent: i >= 4 }" :style="{ animationDelay: (i * 70) + 'ms' }">{{ ch }}</span>
+      </h1>
+
+      <p class="tagline"><b>Music</b> &amp; creative tools by ryukaao.</p>
+
+      <div class="listen">
+        <a class="listen-cta" href="https://ryukaao.bandcamp.com/" target="_blank" rel="noopener noreferrer">
+          <span class="label">Listen on</span>
+          <strong>
+            Bandcamp
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 18.75l7.437-13.5H24l-7.438 13.5H0z"/></svg>
+          </strong>
+        </a>
+        <div class="player">
+          <div class="label" style="display:flex;gap:10px;align-items:center"><span class="eq"><i></i><i></i><i></i><i></i></span>Game OST</div>
+          <iframe title="Game OST by ryukaao" src="https://bandcamp.com/EmbeddedPlayer/album=4041477557/size=large/bgcol=ffffff/linkcol=2a9d8f/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://ryukaao.bandcamp.com/album/game-ost">Game OST by ryukaao</a></iframe>
           <!-- BANDCAMP_PLAYER -->
         </div>
       </div>
+
+      <div class="scroll-hint label"><span>Scroll</span></div>
     </div>
 
-    <main>
-      <section class="mb-16">
-        <h2 class="text-3xl font-bold text-center mb-10 text-primary">Creations</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <a v-for="(item, index) in creations" :key="item.title" :href="item.url"
-             class="card glass shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out fade-in group"
-             :style="{ animationDelay: (index * 100) + 'ms' }">
-            <div class="card-body items-center text-center">
-              <h3 class="card-title text-xl font-semibold group-hover:text-secondary transition-colors">{{ item.title }}</h3>
-              <p class="text-base-content/70">{{ item.description || 'Click to see more' }}</p>
-            </div>
-          </a>
-        </div>
-      </section>
+    <div class="sheet">
+      <main>
+        <section id="creations">
+          <div class="sec-head reveal">
+            <span class="num label">01</span>
+            <h2>Creations</h2>
+            <span class="count label">{{ pad(creations.length) }} works</span>
+          </div>
+          <div class="bento">
+            <a v-for="(item, i) in creations" :key="item.title" :href="item.url" class="tile reveal" :title="item.description" :style="{ '--tile-bg': tone(i).bg }">
+              <div class="shape circle" :style="tone(i).circle"></div>
+              <div class="shape square" :style="tone(i).square"></div>
+              <div class="top label"><span>{{ pad(i + 1) }}</span><span class="arrow">↗</span></div>
+              <h3>{{ item.title }}</h3>
+            </a>
+          </div>
+        </section>
 
-      <div class="divider divider-accent my-16"></div>
+        <section id="zikken">
+          <div class="sec-head reveal">
+            <span class="num label">02</span>
+            <h2>Zikken</h2>
+            <span class="count label">{{ pad(zikken.length) }} experiments</span>
+          </div>
+          <ul class="index">
+            <li v-for="(item, i) in zikken" :key="item.title" class="reveal">
+              <a :href="item.url" :title="item.description">
+                <span class="label">Z—{{ pad(i + 1) }}</span>
+                <span class="name">{{ item.title }}</span>
+                <span class="go label">Open →</span>
+              </a>
+            </li>
+          </ul>
+        </section>
 
-      <section class="mb-16">
-        <h2 class="text-3xl font-bold text-center mb-10 text-accent">Zikken</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <a v-for="(item, index) in zikken" :key="item.title" :href="item.url"
-             class="card glass shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out fade-in group"
-             :style="{ animationDelay: (index * 100) + 'ms' }">
-            <div class="card-body items-center text-center">
-              <h3 class="card-title text-xl font-semibold group-hover:text-secondary transition-colors">{{ item.title }}</h3>
-              <p class="text-base-content/70">{{ item.description || 'Click to see more' }}</p>
-            </div>
-          </a>
-        </div>
-      </section>
+        <section id="links">
+          <div class="sec-head reveal">
+            <span class="num label">03</span>
+            <h2>Links</h2>
+            <span class="count label">Elsewhere</span>
+          </div>
+          <div class="links reveal">
+            <a v-for="(item, i) in links" :key="item.title" :href="item.url" target="_blank" rel="noopener noreferrer"
+               :class="{ main: item.title === 'Bandcamp' }">{{ item.title }}<sup>{{ pad(i + 1) }}</sup></a>
+          </div>
+        </section>
+      </main>
 
-      <div class="divider divider-primary my-16"></div>
-
-      <section>
-        <h2 class="text-3xl font-bold text-center mb-10 text-neutral">Links</h2>
-        <div class="flex flex-wrap justify-center gap-6">
-          <a v-for="(item, index) in links" :key="item.title" :href="item.url" target="_blank" rel="noopener noreferrer"
-             class="btn btn-wide btn-neutral btn-outline transition-transform duration-300 hover:scale-105 fade-in"
-             :style="{ animationDelay: (creations.length * 100 + index * 100) + 'ms' }">
-            {{ item.title }}
-          </a>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer footer-center p-10 mt-20 glass text-base-content rounded-box">
-        <aside>
-            <p class="font-semibold">ryukaao's Portfolio</p>
-        </aside>
-    </footer>
-
+      <footer class="label">
+        <span>© ryukaao</span>
+        <a href="#">Top ↑</a>
+      </footer>
+    </div>
   </div>
 
   <script>
@@ -131,8 +442,76 @@
             { title: 'Bandcamp', url: 'https://ryukaao.bandcamp.com/' }
           ]
         }
+      },
+      methods: {
+        pad(n) { return String(n).padStart(2, '0') },
+        // circle + square composition per tile, echoing the background image
+        tone(i) {
+          const sets = [
+            ['#2a9d8f', '#e9d36f', '#dc8758'],
+            ['#dc8758', '#eeb46b', '#2a9d8f'],
+            ['#1c6f66', '#9fae7d', '#eeb46b'],
+            ['#9fae7d', '#e9d36f', '#1c6f66'],
+            ['#173430', '#dc8758', '#2a9d8f']
+          ]
+          const [bg, c, s] = sets[i % sets.length]
+          const cx = 35 + (i * 37) % 50
+          const cy = -30 + (i * 53) % 50
+          const size = 55 + (i * 29) % 35
+          return {
+            bg,
+            circle: { background: c, width: size + '%', aspectRatio: '1', left: cx + '%', top: cy + '%' },
+            square: { background: s, width: (18 + (i * 13) % 14) + '%', aspectRatio: '1', left: (8 + (i * 23) % 30) + '%', top: (12 + (i * 17) % 20) + '%', opacity: .75 }
+          }
+        }
+      },
+      mounted() {
+        const io = new IntersectionObserver(entries => {
+          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } })
+        }, { threshold: 0.12 })
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el))
       }
     }).mount('#app')
+
+    // background: slow interfering sound waves that lean toward the cursor
+    ;(() => {
+      const cv = document.getElementById('wave')
+      const ctx = cv.getContext('2d')
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+      let w, h, dpr, mx = 0.5, my = 0.5, t = 0
+      const resize = () => {
+        dpr = Math.min(devicePixelRatio || 1, 2)
+        w = cv.width = innerWidth * dpr
+        h = cv.height = innerHeight * dpr
+      }
+      addEventListener('resize', resize)
+      addEventListener('pointermove', e => { mx = e.clientX / innerWidth; my = e.clientY / innerHeight })
+      resize()
+      const LINES = 12
+      const draw = () => {
+        ctx.clearRect(0, 0, w, h)
+        for (let k = 0; k < LINES; k++) {
+          const p = k / (LINES - 1)
+          ctx.strokeStyle = `rgba(251,246,234,${0.12 + (1 - Math.abs(p - 0.5) * 2) * 0.22})`
+          ctx.lineWidth = dpr
+          ctx.beginPath()
+          const base = h * (0.3 + p * 0.45)
+          for (let x = 0; x <= w; x += 6 * dpr) {
+            const u = x / w
+            const pull = Math.exp(-((u - mx) ** 2) * 18) * (my - 0.5) * h * 0.25
+            const y = base
+              + Math.sin(u * 7 + t * 0.6 + k * 0.35) * h * 0.035
+              + Math.sin(u * 17 - t * 0.9 + k * 0.6) * h * 0.012 * (1 + p)
+              + pull * (1 - Math.abs(p - 0.5))
+            x ? ctx.lineTo(x, y) : ctx.moveTo(x, y)
+          }
+          ctx.stroke()
+        }
+        t += 0.01
+        if (!still) requestAnimationFrame(draw)
+      }
+      draw()
+    })()
   </script>
 
 </body>
