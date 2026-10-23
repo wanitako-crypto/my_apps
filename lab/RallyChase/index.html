@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ラリーボール デモ</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #2c4220; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  .lil-gui.root { z-index: 10; max-height: 100vh; overflow-y: auto; }
+  /* 名前の欄を狭めて、スライダーを広く取る */
+  .lil-gui { --name-width: 38%; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<!-- 調整パネル(読み込めなくてもゲームは動く) -->
+<script src="https://cdn.jsdelivr.net/npm/lil-gui@0.19.2/dist/lil-gui.umd.min.js"></script>
+<!-- file:// で開けるよう、ES modules ではなく通常の script で読み込む -->
+<script src="js/util.js"></script>
+<script src="js/config.js"></script>
+<script src="js/input.js"></script>
+<script src="js/obstacles.js"></script>
+<script src="js/world.js"></script>
+<script src="js/car.js"></script>
+<script src="js/ball.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
