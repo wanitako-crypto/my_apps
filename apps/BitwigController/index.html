@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitwig Controllers</title>
+  <meta name="description" content="Bitwig Studio 用コントローラースクリプト（.js）の配布ページ。">
+  <style>
+    :root {
+      --sky-top: #3fa9e8;
+      --sky-mid: #8fd6f5;
+      --sky-low: #e4f7fb;
+      --grass: #7ccf4a;
+      --ink: #0d3550;
+      --ink-soft: #2f5d78;
+      --glass: rgba(255, 255, 255, 0.38);
+      --glass-edge: rgba(255, 255, 255, 0.75);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+      color: var(--ink);
+      background: var(--sky-low);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 120% 50% at 50% 115%, #b8ec7e 0%, var(--grass) 38%, transparent 39%),
+        radial-gradient(circle at 80% 8%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 22%),
+        linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 45%, var(--sky-low) 80%);
+    }
+
+    /* 浮かぶ泡 */
+    .bubbles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .bubbles span {
+      position: absolute;
+      bottom: -120px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 28%, rgba(255,255,255,.95) 0 8%, rgba(255,255,255,0) 22%),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 55%, rgba(255,255,255,.55) 70%, rgba(160,225,255,.35) 100%);
+      border: 1px solid rgba(255,255,255,.6);
+      animation: rise linear infinite;
+    }
+    @keyframes rise {
+      from { transform: translate(0, 0); opacity: 0; }
+      10% { opacity: .9; }
+      to { transform: translate(40px, -115vh); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { .bubbles { display: none; } }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 28px 16px 64px;
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,.62) 0%, var(--glass) 48%, rgba(255,255,255,.22) 100%);
+      border: 1px solid var(--glass-edge);
+      border-radius: 22px;
+      box-shadow:
+        0 10px 30px rgba(13, 53, 80, .18),
+        inset 0 1px 0 rgba(255,255,255,.95),
+        inset 0 -12px 24px rgba(120, 200, 240, .18);
+      backdrop-filter: blur(14px) saturate(1.3);
+      -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .back:hover { background: rgba(255,255,255,.7); }
+
+    header { text-align: center; margin: 26px 0 30px; padding: 30px 20px; }
+    header h1 {
+      margin: 0;
+      font-size: clamp(28px, 6vw, 44px);
+      font-weight: 300;
+      letter-spacing: .02em;
+      color: #fff;
+      text-shadow: 0 2px 0 rgba(13,53,80,.25), 0 0 18px rgba(30,140,210,.55);
+    }
+    header h1 b { font-weight: 700; }
+    header p { margin: 12px 0 0; color: var(--ink-soft); line-height: 1.7; }
+
+    .card { padding: 22px; margin-bottom: 26px; }
+    .card h2 { margin: 0 0 4px; font-size: 22px; }
+    .card .file { font-family: Consolas, Menlo, monospace; font-size: 13px; color: var(--ink-soft); }
+    .card p { line-height: 1.8; margin: 12px 0 18px; }
+
+    .video {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.9);
+      box-shadow: 0 6px 18px rgba(13,53,80,.2);
+      background: #0d3550;
+    }
+    .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    /* アクア風ボタン */
+    .dl {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 26px;
+      border-radius: 999px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      text-shadow: 0 1px 1px rgba(0,60,20,.45);
+      background: linear-gradient(180deg, #a8ee6a 0%, #5cc22b 50%, #3fa516 51%, #6fd23a 100%);
+      border: 1px solid #2f8a10;
+      box-shadow: 0 4px 12px rgba(40,120,20,.35), inset 0 -3px 6px rgba(255,255,255,.35);
+      overflow: hidden;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .dl::before {
+      content: "";
+      position: absolute;
+      left: 8%; right: 8%; top: 2px;
+      height: 48%;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.1));
+      pointer-events: none;
+    }
+    .dl:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(40,120,20,.45), inset 0 -3px 6px rgba(255,255,255,.35); }
+    .dl:active { transform: translateY(1px); }
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 18px; }
+    .row .meta { font-size: 13px; color: var(--ink-soft); }
+
+    .howto { padding: 20px 22px; }
+    .howto h2 { margin: 0 0 8px; font-size: 18px; }
+    .howto ol { margin: 0; padding-left: 1.3em; line-height: 1.9; }
+    .howto code {
+      font-family: Consolas, Menlo, monospace;
+      font-size: 13px;
+      background: rgba(255,255,255,.65);
+      padding: 1px 6px;
+      border-radius: 6px;
+      word-break: break-all;
+    }
+
+    footer { text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="bubbles" aria-hidden="true">
+    <span style="left:6%;  width:60px; height:60px; animation-duration:19s; animation-delay:-3s"></span>
+    <span style="left:18%; width:26px; height:26px; animation-duration:13s; animation-delay:-8s"></span>
+    <span style="left:33%; width:44px; height:44px; animation-duration:23s; animation-delay:-14s"></span>
+    <span style="left:52%; width:18px; height:18px; animation-duration:11s; animation-delay:-2s"></span>
+    <span style="left:66%; width:72px; height:72px; animation-duration:27s; animation-delay:-10s"></span>
+    <span style="left:79%; width:30px; height:30px; animation-duration:15s; animation-delay:-6s"></span>
+    <span style="left:91%; width:50px; height:50px; animation-duration:21s; animation-delay:-17s"></span>
+  </div>
+
+  <div class="wrap">
+    <a class="back glass" href="/">← トップへ戻る</a>
+
+    <header class="glass">
+      <h1><b>Bitwig</b> Controllers</h1>
+      <p>Bitwig Studio で使えるコントローラースクリプトです。<br>.js ファイルをそのままダウンロードして使えます。</p>
+    </header>
+
+    <section class="card glass">
+      <h2>Macro Gacha</h2>
+      <div class="file">MacroGacha.control.js</div>
+      <p>DAW内でマクロをランダムに変化させて音色ガチャさせるコントローラー。</p>
+      <div class="video">
+        <iframe src="https://www.youtube-nocookie.com/embed/q0Ff6yey1bw" title="Macro Gacha 紹介動画" loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+      <div class="row">
+        <a class="dl" href="./MacroGacha.control.js" download>⬇ ダウンロード</a>
+        <span class="meta">v1.2 ・ 約10KB</span>
+      </div>
+    </section>
+
+    <section class="card glass">
+      <h2>Macro Random Drift</h2>
+      <div class="file">MacroRandomDrift.control.js</div>
+      <p>DAW内でランダムにマクロを揺らすコントローラー。</p>
+      <div class="video">
+        <iframe src="https://www.youtube-nocookie.com/embed/no5XX59gBqA" title="Macro Random Drift 紹介動画" loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+      <div class="row">
+        <a class="dl" href="./MacroRandomDrift.control.js" download>⬇ ダウンロード</a>
+        <span class="meta">v1.5 ・ 約13KB</span>
+      </div>
+    </section>
+
+    <section class="howto glass">
+      <h2>インストール方法</h2>
+      <ol>
+        <li>ダウンロードした .js を <code>ドキュメント/Bitwig Studio/Controller Scripts/</code> に入れる</li>
+        <li>Bitwig の Settings → Controllers → 「Add Controller」から <b>Custom</b> を選び、追加したいスクリプトを選ぶ</li>
+        <li>操作は Studio I/O パネルに出るボタンや設定から行う</li>
+      </ol>
+    </section>
+
+    <footer>
+      <a class="back glass" href="/">← トップへ戻る</a>
+    </footer>
+  </div>
+</body>
+</html>
